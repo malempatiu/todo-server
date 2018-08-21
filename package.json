@@ -1,0 +1,22 @@
+{
+  "name": "todo-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/*test.js"
+  },
+  "author": "ugesh",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "mongoose": "^5.2.9"
+  },
+  "devDependencies": {
+    "expect": "^23.5.0",
+    "mocha": "^5.2.0",
+    "supertest": "^3.1.0"
+  }
+}
