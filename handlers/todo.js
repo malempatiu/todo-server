@@ -7,7 +7,7 @@ exports.createToDo = async (req, res) => {
         const todo = await ToDoDB.create({ text });
         return res.status(200).json({ todo });
     } catch (err) {
-        return res.status(400).json({error:"Todo should not be empty"});
+        return res.status(400).json({error:err.message});
     };
 };
 
@@ -16,7 +16,7 @@ exports.fetchToDos = async (req, res) => {
         const todos = await ToDoDB.find({});
         return res.status(200).json({ todos });
     } catch (err) {
-        return res.status(400).json({error:"Unable to get todos"});
+        return res.status(400).json({error:err.message});
     };
 };
 
@@ -33,7 +33,7 @@ exports.getToDo = async (req, res) => {
             return res.status(404).json({error:"Found no todo. Invalid ID"});
         }
     } catch (err) {
-        return res.status(400).json({error:"Found no todo"});
+        return res.status(400).json({error:err.message});
     };
 };
 
@@ -50,7 +50,7 @@ exports.deleteToDo = async (req, res) => {
             return res.status(404).json({error:"No todo to delete. Invalid ID"});
         };
     } catch (err) {
-        return res.status(400).json({error:"Unable to delete"});
+        return res.status(400).json({error:err.message});
     };
 };
 
@@ -67,6 +67,6 @@ exports.updateToDo = async (req, res) => {
             return res.status(404).json({error:"No todo to update. Invalid ID"});
         };
      }catch(err){
-        return res.status(400).json({error:"Unable to update."});
+        return res.status(400).json({error:err.message});
      };
 }; 
