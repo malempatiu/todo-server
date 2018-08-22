@@ -4,6 +4,7 @@ const express = require('express'),
     mongoose = require('mongoose'),
     bodyParser = require('body-parser'),
     cors = require('cors');
+
 //Mongoose and App Config
 mongoose.Promise = Promise;
 mongoose.connect('mongodb://localhost:27017/todo-api', { useNewUrlParser: true });
