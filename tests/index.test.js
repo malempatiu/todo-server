@@ -6,120 +6,74 @@ const app = require('../index'),
     ToDoDB = require('../models/todo-model'),
     User = require('../models/user-model');
 
-const userID = "5b7ec61bdfe1d02eb401c7a9";
-let todoID;
+let userID;
+let token;
 
-describe('POST /api/user/:id/todos', () => {
-    it('should create a new todo', (done) => {
-        const text = 'Testing with mocha';
+/********** USER TEST ***************/
+describe('POST /api/user/signup', function () {
+    this.timeout(3000);
+    before((done) => {
+        User.remove({}).then(() => {
+            done();
+        });
+    });
+
+    it('should create a user', (done) => {
+        const email = "abc@gmail.com";
+        const username = "abc";
+        const password = "abc123"
         request(app)
-            .post(`/api/user/${userID}/todos`)
-            .send({ text })
+            .post('/api/user/signup')
+            .send({ email, username, password })
             .expect(200)
             .expect((res) => {
-                expect(res.body.todo.text).toBe(text);
-            })
-            .end(done);
-    }).timeout(3000);
-
-    it('should not create a new todo with invalid body', (done) => {
-        request(app)
-            .post(`/api/user/${userID}/todos`)
-            .send({})
-            .expect(400)
-            .end(done);
-    });
-});
-
-describe('GET /api/user/:id/todos', () => {
-    it('should get all todos of a specific user', (done) => {
-        request(app)
-            .get(`/api/user/${userID}/todos`)
-            .expect(200)
-            .end(done);
-    });
-});
-
-describe('DELETE /api/user/:id/todos/:todo_id', () => {
-    let textToDelete = "Learn Mocha"
-    beforeEach(async () => {
-        const userID = "5b7ec61bdfe1d02eb401c7a9";
-        const createdTodo = await ToDoDB.create({ text: textToDelete });
-        todoID = createdTodo.id;
-        const foundUser = await User.findOne({ _id: userID });
-        foundUser.todos.push(createdTodo.id);
-        await foundUser.save();
-    });
-
-    it('should remove a todo', (done) => {
-        request(app)
-            .delete(`/api/user/${userID}/todos/${todoID}`)
-            .expect(200)
-            .expect((res) => {
-                expect(res.body.deletedTodo.text).toBe(textToDelete);
+                expect(res.body.email).toBe(email);
+                userID = res.body._id;
             })
             .end((err, res) => {
                 if (err) {
-                    return done(err);
-                }
-                ToDoDB.findById(todoID).then((todo) => {
-                    expect(todo).toBeNull();
+                    done(err);
+                };
+                User.findOne({ email }).then((user) => {
+                    expect(user.email).toBe(email);
+                    expect(user._id.toHexString()).toBe(userID);
                     done();
                 })
                     .catch((err) => done(err));
             });
     });
 
-    it('should return 404 if todo not found', (done) => {
-        const id = new ObjectID();
+    it('should not create user for invalid input', (done) => {
         request(app)
-            .delete(`/api/user/${userID}/todos/${id}`)
-            .expect(404)
-            .end(done);
-    });
-
-    it('should return 404 for invalid ID', (done) => {
-        request(app)
-            .delete(`/api/user/${userID}/todos/123`)
-            .expect(404)
-            .end(done);
+        .post('/api/user/signup')
+        .send({email: "ugesh", username:"ugesh", password:"4455"})
+        .expect(400)
+        .end(done);
     });
 });
 
-describe('PUT /api/user/:id/todos/:todo_id', () => {
-    it('should update a todo', (done) => {
-       request(app)
-       .put(`/api/user/${userID}/todos/${todoID}`)
-       .send({completed: true})
-       .expect(200)
-       .expect((res) => {
-           expect(res.body.updatedTodo._id).toBe(todoID);
-       })
-       .end((err, res) => {
-           if(err){
-               return done(err);
-           }
-           ToDoDB.findById(todoID).then((todo) => {
-               expect(todo.completed).toBeTruthy();
-               expect(todo.text).toBe("Learn Mocha");
-               done();
-           })
-           .catch((err) => done(err));
-       });
-    });
-
-    it('should return 404 if todo not found', (done) => {
-        const id = new ObjectID();
+describe('POST /api/user/signin', () => {
+     it('should login the user', (done) => {
+         request(app)
+         .post('/api/user/signin')
+         .send({email:"abc@gmail.com", password: "abc123"})
+         .expect(200)
+         .expect((res) => {
+             expect(res.body._id).toBe(userID);
+             expect(res.body.token).toBeTruthy();
+             token = res.body.token;
+         })
+         .end(done);
+     });
+     it('should not login the user for wrong data', (done) => {
         request(app)
-            .put(`/api/user/${userID}/todos/${id}`)
-            .expect(404)
-            .end(done);
-    });
-
-    it('should return 404 for invalid ID', (done) => {
-        request(app)
-            .put(`/api/user/${userID}/todos/123`)
-            .expect(404)
-            .end(done);
-    });
+        .post('/api/user/signin')
+        .send({email:"abc@gmail.com", password: "abc12"})
+        .expect(400)
+        .end(done);
+     });
 });
+
+
+
+

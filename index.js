@@ -1,3 +1,12 @@
+let env = process.env.NODE_ENV || 'development';
+console.log(env);
+if(env === 'development'){
+    process.env.PORT = 8081;
+    process.env.MONGODB_URI = 'mongodb://localhost:27017/todo_api';
+} else if(env === 'test'){
+    process.env.PORT = 8081;
+    process.env.MONGODB_URI = 'mongodb://localhost:27017/todo_test_api';
+}
 //Importing External Libraries and Modules
 require('dotenv').config();
 const express = require('express'),
@@ -8,7 +17,7 @@ const express = require('express'),
 
 //Mongoose and App Config
 mongoose.Promise = Promise;
-mongoose.connect('mongodb://localhost:27017/todo-api', { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -26,10 +35,9 @@ app.get('/api/user/:id/todos', fetchToDos);
 app.delete('/api/user/:id/todos/:todo_id', deleteToDo);
 app.put('/api/user/:id/todos/:todo_id', updateToDo);
 
-
-const PORT = 8081;
-app.listen(PORT, () => {
-    console.log(`TODO server has started on PORT ${PORT}`);
+const port = process.env.PORT;
+app.listen(port, () => {
+    console.log(`TODO server has started on PORT ${port}`);
 });      
 
 module.exports = app;
