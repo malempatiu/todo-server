@@ -13,19 +13,19 @@ app.use(bodyParser.json());
 app.use(cors());
 
 //Importing Internal Files and Modules
-const {createToDo, fetchToDos, getToDo, deleteToDo, updateToDo} = require('./handlers/todo'),
+const {createToDo, fetchToDos, deleteToDo, updateToDo} = require('./handlers/todo'),
       {registerUser, loginUser} = require('./handlers/user');
 
-//ToDo's Routes
-app.post('/api/todos', createToDo);
-app.get('/api/todos', fetchToDos);
-app.get('/api/todos/:id', getToDo);
-app.delete('/api/todos/:id', deleteToDo);
-app.put('/api/todos/:id', updateToDo);
-
 //User Routes
-app.post('/api/signup', registerUser);
-app.post('/api/signin', loginUser);
+app.post('/api/user/signup', registerUser);
+app.post('/api/user/signin', loginUser);
+
+//ToDo's Routes
+app.post('/api/user/:id/todos', createToDo);
+app.get('/api/user/:id/todos', fetchToDos);
+app.delete('/api/user/:id/todos/:todo_id', deleteToDo);
+app.put('/api/user/:id/todos/:todo_id', updateToDo);
+
 
 const PORT = 8081;
 app.listen(PORT, () => {
