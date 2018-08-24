@@ -95,6 +95,7 @@ describe('POST /api/user/:id/todos', () => {
             .expect(200)
             .expect((res) => {
                 expect(res.body.todo.text).toBe(data.text);
+                todoID = res.body.todo._id;
             })
             .end((err, res) => {
                 if (err) {
@@ -134,17 +135,127 @@ describe('POST /api/user/:id/todos', () => {
 });
 
 describe('GET /api/user/:id/todos', () => {
-     it('should get all todos', (done) => {
+    it('should get all todos', (done) => {
         request(app)
-        .get(`/api/user/${userID}/todos`)
-        .expect(200)
-        .expect((res) => {
-            expect(res.body.todos.length).toBe(1);
-            expect(res.body.todos[0].text).toBe('Create ToDo');
-        })
-        .end(done);
-     });
+            .get(`/api/user/${userID}/todos`)
+            .send({
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todos.length).toBe(1);
+                expect(res.body.todos[0].text).toBe('Create ToDo');
+            })
+            .end(done);
+    });
 });
+
+describe('PUT /api/user/:id/todos/:todo_id', () => {
+    it('should update a todo', (done) => {
+        request(app)
+            .put(`/api/user/${userID}/todos/${todoID}`)
+            .send({
+                completed: true,
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.updatedTodo.completed).toBeTruthy();
+            })
+            .end(done);
+    });
+    it('should not update todo for invalid todo id', (done) => {
+        request(app)
+            .put(`/api/user/${userID}/todos/123`)
+            .send({
+                completed: false,
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .expect(404)
+            .expect((res) => {
+                expect(res.body.error).toBe("Invalid ID");
+            })
+            .end(done);
+    });
+    it('should not update todo for other valid todo id', (done) => {
+        const id = new ObjectID();
+        request(app)
+            .put(`/api/user/${userID}/todos/${id}`)
+            .send({
+                completed: false,
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .expect(404)
+            .expect((res) => {
+                expect(res.body.error).toBe("No todo to update. Invalid ID");
+            })
+            .end(done);
+    });
+});
+
+describe('DELETE /api/user/:id/todos/:todo_id', () => {
+    it('should not delete a todo for invalid todo id', (done) => {
+        request(app)
+            .delete(`/api/user/${userID}/todos/123`)
+            .send({
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .expect(404)
+            .expect((res) => {
+                expect(res.body.error).toBe("Invalid ID");
+            })
+            .end(done);
+    });
+    it('should not delete a todo for other valid todo id', (done) => {
+        const id = new ObjectID();
+        request(app)
+            .delete(`/api/user/${userID}/todos/${id}`)
+            .send({
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .expect(404)
+            .expect((res) => {
+                expect(res.body.error).toBe("No todo to delete. Invalid ID");
+            })
+            .end(done);
+    });
+    it('should delete a todo', (done) => {
+        request(app)
+            .delete(`/api/user/${userID}/todos/${todoID}`)
+            .send({
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.deletedTodo.text).toBe("Create ToDo");
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                };
+                ToDoDB.find({}).then((todos) => {
+                    expect(todos.length).toBe(0);
+                    done();
+                })
+                    .catch((err) => done(err));
+            });
+    });
+});
+
 
 
 
