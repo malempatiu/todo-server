@@ -32,9 +32,9 @@ app.post('/api/user/signin', loginUser);
 
 //ToDo's Routes
 app.post('/api/user/:id/todos', isLoggedIn, isAuthorized, createToDo);
-app.get('/api/user/:id/todos', fetchToDos);
+app.get('/api/user/:id/todos', isLoggedIn, isAuthorized, fetchToDos);
 app.delete('/api/user/:id/todos/:todo_id', isLoggedIn, isAuthorized, deleteToDo);
-app.put('/api/user/:id/todos/:todo_id', updateToDo);
+app.put('/api/user/:id/todos/:todo_id', isLoggedIn, isAuthorized, updateToDo);
 
 const port = process.env.PORT;
 app.listen(port, () => {
