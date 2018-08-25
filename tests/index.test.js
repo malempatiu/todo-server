@@ -84,13 +84,11 @@ describe('POST /api/user/:id/todos', () => {
     });
     it('should create a todo', (done) => {
         const data = {
-            text: "Create ToDo",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+            text: "Create ToDo"
         };
         request(app)
             .post(`/api/user/${userID}/todos`)
+            .set("authorization", `Bearer ${token}`)
             .send(data)
             .expect(200)
             .expect((res) => {
@@ -121,13 +119,11 @@ describe('POST /api/user/:id/todos', () => {
     });
     it('should not create a todo with empty data', (done) => {
         const data = {
-            text: "",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+            text: ""
         };
         request(app)
             .post(`/api/user/${userID}/todos`)
+            .set("authorization", `Bearer ${token}`)
             .send(data)
             .expect(400)
             .end(done);
@@ -138,11 +134,7 @@ describe('GET /api/user/:id/todos', () => {
     it('should get all todos', (done) => {
         request(app)
             .get(`/api/user/${userID}/todos`)
-            .send({
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            .set("authorization", `Bearer ${token}`)
             .expect(200)
             .expect((res) => {
                 expect(res.body.todos.length).toBe(1);
@@ -156,12 +148,8 @@ describe('PUT /api/user/:id/todos/:todo_id', () => {
     it('should update a todo', (done) => {
         request(app)
             .put(`/api/user/${userID}/todos/${todoID}`)
-            .send({
-                completed: true,
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            .set("authorization", `Bearer ${token}`)
+            .send({completed: true})
             .expect(200)
             .expect((res) => {
                 expect(res.body.updatedTodo.completed).toBeTruthy();
@@ -171,12 +159,8 @@ describe('PUT /api/user/:id/todos/:todo_id', () => {
     it('should not update todo for invalid todo id', (done) => {
         request(app)
             .put(`/api/user/${userID}/todos/123`)
-            .send({
-                completed: false,
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            .set("authorization", `Bearer ${token}`)
+            .send({completed: false})
             .expect(404)
             .expect((res) => {
                 expect(res.body.error).toBe("Invalid ID");
@@ -187,12 +171,8 @@ describe('PUT /api/user/:id/todos/:todo_id', () => {
         const id = new ObjectID();
         request(app)
             .put(`/api/user/${userID}/todos/${id}`)
-            .send({
-                completed: false,
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            .set("authorization", `Bearer ${token}`)
+            .send({completed: false})
             .expect(404)
             .expect((res) => {
                 expect(res.body.error).toBe("No todo to update. Invalid ID");
@@ -205,11 +185,7 @@ describe('DELETE /api/user/:id/todos/:todo_id', () => {
     it('should not delete a todo for invalid todo id', (done) => {
         request(app)
             .delete(`/api/user/${userID}/todos/123`)
-            .send({
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            .set("authorization", `Bearer ${token}`)
             .expect(404)
             .expect((res) => {
                 expect(res.body.error).toBe("Invalid ID");
@@ -220,11 +196,7 @@ describe('DELETE /api/user/:id/todos/:todo_id', () => {
         const id = new ObjectID();
         request(app)
             .delete(`/api/user/${userID}/todos/${id}`)
-            .send({
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            .set("authorization", `Bearer ${token}`)
             .expect(404)
             .expect((res) => {
                 expect(res.body.error).toBe("No todo to delete. Invalid ID");
@@ -234,11 +206,7 @@ describe('DELETE /api/user/:id/todos/:todo_id', () => {
     it('should delete a todo', (done) => {
         request(app)
             .delete(`/api/user/${userID}/todos/${todoID}`)
-            .send({
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            .set("authorization", `Bearer ${token}`)
             .expect(200)
             .expect((res) => {
                 expect(res.body.deletedTodo.text).toBe("Create ToDo");
