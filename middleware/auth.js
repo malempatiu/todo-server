@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 exports.isLoggedIn = (req, res, next) => {
     try {
-        let token = req.body.headers.Authorization.split(' ')[1];
+        let token = req.headers.authorization.split(' ')[1];
         jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
             if (decoded) {
                 return next();
@@ -18,7 +18,7 @@ exports.isLoggedIn = (req, res, next) => {
 
 exports.isAuthorized = (req, res, next) => {
     try {
-        let token = req.body.headers.Authorization.split(' ')[1];
+        let token = req.headers.authorization.split(' ')[1];
         jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
             if (decoded && decoded._id === req.params.id) {
                 return next();
